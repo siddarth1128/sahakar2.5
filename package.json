@@ -1,0 +1,14 @@
+{
+  "name": "fixitnow-platform",
+  "version": "1.0.0",
+  "description": "Complete service booking platform with customer, technician, and admin features",
+  "scripts": {
+    "build": "cd frontend && npm ci && npm run build",
+    "start": "cd frontend && npm start",
+    "install": "cd frontend && npm ci"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  }
+}

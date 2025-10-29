@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import "../styles/Dashboard.css";
+import "../styles/DashboardClean.css";
 
 const DashboardLayout = ({ children, title = "Dashboard" }) => {
   const navigate = useNavigate();
