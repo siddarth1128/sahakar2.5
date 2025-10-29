@@ -1,0 +1,60 @@
+{
+  "name": "fixitnow-backend",
+  "version": "1.0.0",
+  "description": "FixItNow Backend API - Professional Home Services Platform",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "create-admin": "node scripts/createAdmin.js",
+    "update-technicians": "node scripts/updateTechnicians.js",
+    "seed": "node scripts/seedData.js",
+    "clean-users": "node scripts/cleanUnverifiedUsers.js clean-all",
+    "clean-old-users": "node scripts/cleanUnverifiedUsers.js clean-old",
+    "list-users": "node scripts/cleanUnverifiedUsers.js list",
+    "init-technicians": "node scripts/initializeTechnicians.js init",
+    "list-technicians": "node scripts/initializeTechnicians.js list",
+    "add-tech-services": "node scripts/initializeTechnicians.js add-defaults",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "fixitnow",
+    "home-services",
+    "booking",
+    "api"
+  ],
+  "author": "FixItNow Team",
+  "license": "MIT",
+  "dependencies": {
+    "@googlemaps/google-maps-services-js": "^3.4.2",
+    "bcryptjs": "^2.4.3",
+    "compression": "^1.7.4",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-mongo-sanitize": "^2.2.0",
+    "express-rate-limit": "^7.1.5",
+    "express-validator": "^7.0.1",
+    "google-auth-library": "^9.15.1",
+    "helmet": "^8.1.0",
+    "hpp": "^0.2.3",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.0.3",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.9.7",
+    "pdfkit": "^0.14.0",
+    "redis": "^4.6.11",
+    "socket.io": "^4.7.4",
+    "uuid": "^9.0.1",
+    "xss-clean": "^0.1.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  }
+}
