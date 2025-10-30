@@ -214,11 +214,6 @@ const TechnicianRequests = () => {
     }
   };
 
-  // View customer profile
-  const handleViewCustomer = (customerId) => {
-    navigate(`/technician/customer/${customerId}`);
-  };
-
   // Contact customer
   const handleContactCustomer = (booking) => {
     if (booking.customer?.phone) {

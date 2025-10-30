@@ -13,7 +13,6 @@ const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
 const BookService = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { user } = useAuth();
   const { onBookingCreated } = useCustomerStats();
 
   const services = [
@@ -63,7 +62,6 @@ const BookService = () => {
   const [errors, setErrors] = useState({});
   const [step, setStep] = useState(1);
   const [technician, setTechnician] = useState(null);
-  const [loadingTechnician, setLoadingTechnician] = useState(false);
 
   useEffect(() => {
     const preSelectedService = searchParams.get("service");
@@ -86,7 +84,6 @@ const BookService = () => {
   const fetchTechnicianDetails = async (technicianId) => {
     if (!technicianId) return;
 
-    setLoadingTechnician(true);
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get(`${API_URL}/users/${technicianId}`, {
@@ -101,8 +98,6 @@ const BookService = () => {
     } catch (error) {
       console.error("Error fetching technician:", error);
       toast.error("Could not load technician details");
-    } finally {
-      setLoadingTechnician(false);
     }
   };
 

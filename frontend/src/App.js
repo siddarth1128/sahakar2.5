@@ -25,7 +25,6 @@ import TechnicianRequests from "./pages/TechnicianRequests";
 import TechnicianProfile from "./pages/TechnicianProfile";
 import TechnicianEarnings from "./pages/TechnicianEarnings";
 import TechnicianSettings from "./pages/TechnicianSettings";
-import AdminDashboard from "./pages/AdminDashboard";
 import NewAdminDashboard from "./pages/NewAdminDashboard";
 import TechniciansList from "./pages/TechniciansList";
 import TechnicianPublicProfile from "./pages/TechnicianPublicProfile";
@@ -39,6 +38,8 @@ import NotFound from "./pages/NotFound";
 import CustomerBookings from "./pages/CustomerBookings";
 import CustomerHistory from "./pages/CustomerHistory";
 import CustomerReviews from "./pages/CustomerReviews";
+import InvoicePage from "./pages/InvoicePage";
+import BookingDetails from "./pages/BookingDetails";
 import CustomerSupport from "./pages/CustomerSupport";
 import CustomerNotifications from "./pages/CustomerNotifications";
 import CustomerPrivacy from "./pages/CustomerPrivacy";
@@ -368,10 +369,19 @@ function App() {
                 />
 
                 <Route
-                  path="/customer/support"
+                  path="/invoice/:bookingId"
                   element={
                     <ProtectedRoute allowedRoles={["customer"]}>
-                      <CustomerSupport />
+                      <InvoicePage />
+                    </ProtectedRoute>
+                  }
+                />
+
+                <Route
+                  path="/booking/details/:bookingId"
+                  element={
+                    <ProtectedRoute allowedRoles={["customer"]}>
+                      <BookingDetails />
                     </ProtectedRoute>
                   }
                 />

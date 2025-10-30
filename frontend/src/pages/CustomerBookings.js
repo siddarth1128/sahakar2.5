@@ -1,16 +1,22 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import { useCustomerStats } from "../context/CustomerStatsContext";
 import DashboardLayout from "../components/DashboardLayout";
+import ReviewForm from "../components/ReviewForm";
 import "../styles/Dashboard.css";
 
 const CustomerBookings = () => {
+  const navigate = useNavigate();
   const { stats, loading: statsLoading } = useCustomerStats();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedBookingForReview, setSelectedBookingForReview] = useState(null);
+  const [existingReviews, setExistingReviews] = useState({});
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     fetchBookings();
   }, []);
@@ -27,13 +33,127 @@ const CustomerBookings = () => {
 
       const data = await response.json();
       if (data.success) {
-        setBookings(data.data.bookings || []);
+        const bookingsData = data.data.bookings || [];
+        setBookings(bookingsData);
+        
+        // Check for existing reviews for completed bookings
+        await checkExistingReviews(bookingsData);
       }
     } catch (error) {
       console.error("Error fetching bookings:", error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const checkExistingReviews = async (bookings) => {
+    const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
+    const token = localStorage.getItem("token");
+    const reviews = {};
+
+    for (const booking of bookings.filter(b => b.status === "completed")) {
+      try {
+        const response = await fetch(`${API_URL}/reviews/booking/${booking._id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success) {
+            reviews[booking._id] = data.data.review;
+          }
+        }
+      } catch (error) {
+        // Review doesn't exist, which is fine
+        console.log(`No review found for booking ${booking._id}`);
+      }
+    }
+    
+    setExistingReviews(reviews);
+  };
+
+  const handleRateService = (booking) => {
+    console.log("Rate Service clicked for booking:", booking._id);
+    
+    // Check if review already exists
+    if (existingReviews[booking._id]) {
+      toast.info("You have already reviewed this service");
+      return;
+    }
+    
+    setSelectedBookingForReview(booking);
+  };
+
+  const handleReviewSubmitted = (review) => {
+    setExistingReviews(prev => ({
+      ...prev,
+      [selectedBookingForReview._id]: review
+    }));
+    setSelectedBookingForReview(null);
+    toast.success("Review submitted successfully!");
+  };
+
+  const handleCancelReview = () => {
+    setSelectedBookingForReview(null);
+  };
+
+  const handleCancelBooking = async (booking) => {
+    const confirmed = window.confirm(
+      `Are you sure you want to cancel the booking for ${booking.serviceType}?`,
+    );
+    if (!confirmed) return;
+
+    try {
+      const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
+      const token = localStorage.getItem("token");
+
+      const response = await fetch(`${API_URL}/bookings/${booking._id}/cancel`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || "Unable to cancel booking");
+      }
+
+      toast.success("Booking cancelled successfully");
+
+      setBookings((prev) =>
+        prev.map((item) =>
+          item._id === booking._id ? { ...item, status: "cancelled" } : item,
+        ),
+      );
+    } catch (error) {
+      console.error("Error cancelling booking:", error);
+      toast.error(error.message || "Failed to cancel booking. Please try again.");
+    }
+  };
+
+  const handleBookAgain = (booking) => {
+    toast.success("Redirecting to booking page...");
+
+    const bookingData = {
+      serviceType: booking.serviceType,
+      address: booking.address,
+      description: booking.description,
+    };
+
+    localStorage.setItem("rebookingData", JSON.stringify(bookingData));
+    navigate("/book-service");
+  };
+
+  const handleViewInvoice = (booking) => {
+    navigate(`/invoice/${booking._id}`);
+  };
+
+  const handleViewDetails = (booking) => {
+    navigate(`/booking/details/${booking._id}`);
   };
 
   const getStatusColor = (status) => {
@@ -266,51 +386,99 @@ const CustomerBookings = () => {
                 <div className="booking-actions">
                   {booking.status === "pending" && (
                     <>
-                      <button className="btn-action btn-secondary">
+                      <button 
+                        className="btn-action btn-secondary"
+                        onClick={() => toast.info("Edit booking feature coming soon!")}
+                      >
                         <i className="fas fa-edit"></i> Edit
                       </button>
-                      <button className="btn-action btn-danger">
+                      <button 
+                        className="btn-action btn-danger"
+                        onClick={() => handleCancelBooking(booking)}
+                      >
                         <i className="fas fa-times"></i> Cancel
                       </button>
                     </>
                   )}
                   {booking.status === "confirmed" && (
                     <>
-                      <button className="btn-action btn-primary">
+                      <button 
+                        className="btn-action btn-primary"
+                        onClick={() => toast.info("Tracking feature coming soon!")}
+                      >
                         <i className="fas fa-map-marked-alt"></i> Track
                       </button>
-                      <button className="btn-action btn-secondary">
+                      <button 
+                        className="btn-action btn-secondary"
+                        onClick={() => toast.info("Chat feature coming soon!")}
+                      >
                         <i className="fas fa-comments"></i> Chat
                       </button>
-                      <button className="btn-action btn-secondary">
+                      <button 
+                        className="btn-action btn-secondary"
+                        onClick={() => toast.info("Call feature coming soon!")}
+                      >
                         <i className="fas fa-phone"></i> Call
                       </button>
                     </>
                   )}
                   {booking.status === "in-progress" && (
                     <>
-                      <button className="btn-action btn-primary">
+                      <button 
+                        className="btn-action btn-primary"
+                        onClick={() => toast.info("Live tracking feature coming soon!")}
+                      >
                         <i className="fas fa-map-marked-alt"></i> Live Track
                       </button>
-                      <button className="btn-action btn-secondary">
+                      <button 
+                        className="btn-action btn-secondary"
+                        onClick={() => toast.info("Chat feature coming soon!")}
+                      >
                         <i className="fas fa-comments"></i> Chat
                       </button>
-                      <button className="btn-action btn-secondary">
+                      <button 
+                        className="btn-action btn-secondary"
+                        onClick={() => toast.info("Photo upload feature coming soon!")}
+                      >
                         <i className="fas fa-camera"></i> Add Photo
                       </button>
                     </>
                   )}
                   {booking.status === "completed" && (
                     <>
-                      <button className="btn-action btn-primary">
-                        <i className="fas fa-star"></i> Rate Service
+                      <button 
+                        className={`btn-action ${existingReviews[booking._id] ? 'btn-success' : 'btn-primary'}`}
+                        onClick={() => handleRateService(booking)}
+                        style={{ backgroundColor: existingReviews[booking._id] ? '#00cc88' : '#0055ff', color: 'white' }}
+                      >
+                        <i className={`fas ${existingReviews[booking._id] ? 'fa-check' : 'fa-star'}`}></i> 
+                        {existingReviews[booking._id] ? 'Reviewed' : 'Rate Service'}
                       </button>
-                      <button className="btn-action btn-secondary">
+                      <button 
+                        className="btn-action btn-secondary" 
+                        style={{ backgroundColor: '#4b5563', color: 'white' }}
+                        onClick={() => handleBookAgain(booking)}
+                      >
                         <i className="fas fa-redo"></i> Book Again
+                      </button>
+                      <button 
+                        className="btn-action btn-secondary" 
+                        style={{ backgroundColor: '#4b5563', color: 'white' }}
+                        onClick={() => handleViewInvoice(booking)}
+                      >
+                        <i className="fas fa-file-invoice"></i> Invoice
                       </button>
                     </>
                   )}
-                  <button className="btn-action btn-secondary">
+                  {/* Debug info - remove after testing */}
+                  <div style={{ fontSize: '12px', color: '#666', marginTop: '5px' }}>
+                    Status: {booking.status} | ID: {booking._id?.substring(0, 8)}...
+                  </div>
+                  <button 
+                    className="btn-action btn-secondary"
+                    onClick={() => handleViewDetails(booking)}
+                    style={{ backgroundColor: '#4b5563', color: 'white' }}
+                  >
                     <i className="fas fa-eye"></i> View Details
                   </button>
                 </div>
@@ -327,6 +495,15 @@ const CustomerBookings = () => {
           </div>
         )}
       </div>
+
+      {/* Review Form Modal */}
+      {selectedBookingForReview && (
+        <ReviewForm
+          booking={selectedBookingForReview}
+          onReviewSubmitted={handleReviewSubmitted}
+          onCancel={handleCancelReview}
+        />
+      )}
     </DashboardLayout>
   );
 };

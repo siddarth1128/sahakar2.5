@@ -20,8 +20,6 @@ import {
   FaExclamationTriangle,
   FaSearch,
   FaFilter,
-  FaStar,
-  FaComments,
   FaCheck,
   FaTimes,
 } from "react-icons/fa";

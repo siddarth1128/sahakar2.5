@@ -163,6 +163,7 @@ app.use("/api/notifications", require("./routes/notificationRoutes"));
 app.use("/api/users", require("./routes/userRoutes"));
 app.use("/api/technician", require("./routes/technicianRoutes"));
 app.use("/api/customer", require("./routes/customerRoutes"));
+app.use("/api/reviews", require("./routes/reviewRoutes"));
 
 // 404 handler - must be after all other routes
 app.use("*", (req, res) => {

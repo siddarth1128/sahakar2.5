@@ -8,10 +8,6 @@ import {
   FaBell,
   FaLock,
   FaShieldAlt,
-  FaLanguage,
-  FaMoon,
-  FaSun,
-  FaCheckCircle,
   FaTimesCircle,
   FaKey,
   FaSignOutAlt,
@@ -84,6 +80,7 @@ const TechnicianSettings = () => {
   const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
 
   // Fetch settings
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     fetchSettings();
   }, []);

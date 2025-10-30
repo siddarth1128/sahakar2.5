@@ -20,7 +20,6 @@ import {
   FaReceipt,
   FaUser,
   FaTools,
-  FaTimes,
   FaExclamationCircle,
 } from "react-icons/fa";
 import "../styles/TechnicianPages.css";
